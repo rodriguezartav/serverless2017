@@ -8,8 +8,8 @@ function DeployFunction(functionName){
   var _this = this;
 
   return _this.rsync('./functions/' + functionName  + '/node_modules', "./functions")
-  .then( function(){
-    return _this.zip(functionName)
+  .then( function(useNodeModules){
+    return _this.zip(functionName,useNodeModules)
   })
   .then( function(){
     return _this.rsync("functions/node_modules", './functions/' + functionName);
@@ -22,7 +22,10 @@ DeployFunction.prototype.rsync = function (source, destination) {
   function promise(resolve,reject){
 
     exec('rsync -r '+ source + '  ' + destination , function (err) {
-      if (err) console.log("Could not find " + source)
+      if (err){
+        console.log("Could not find " + source)
+        return resolve(false);
+      }
       rimraf.sync(source);
       return resolve(true);
     });
@@ -30,11 +33,12 @@ DeployFunction.prototype.rsync = function (source, destination) {
   return new Promise(promise);
 };
 
-DeployFunction.prototype.zip = function(functionName){
+DeployFunction.prototype.zip = function(functionName,useNodeModules){
   function promise(resolve,reject){
     var zipfile = functionName+'.zip';
     rimraf.sync("./.serverless/" + functionName +".zip");
-    cmd = 'zip -r ../.serverless/' + zipfile + ' ' + functionName + '/* ./common/* ./node_modules/*';
+    var cmd = 'zip -r ../.serverless/' + zipfile + ' ' + functionName + '/* ./common/*';
+    if(useNodeModules) cmd += ' ./node_modules/*';
     exec(cmd, {
       cwd: "./functions",
       maxBuffer: 50 * 1024 * 1024

@@ -2,7 +2,7 @@
 const BbPromise = require('bluebird');
 const Deploy = require("../deploy");
 
-class SlsBrowserify {
+class SmartPacker {
   constructor(serverless, options) {
     this.serverless             = serverless;
     this.options                = options;
@@ -19,51 +19,42 @@ class SlsBrowserify {
 
         const functionNames = this.serverless.service.getAllFunctions();
         const bundleQueue   = functionNames.map(functionName => {
+          _this.serverless.cli.log(`Bundling ${functionName} with SmartPacker...`);
           let functionObject           = _this.serverless.service.getFunction(functionName);
-          this.serverless.cli.log(`Bundling ${functionName} with Deploy...`);
           functionObject.artifact  = "./.serverless/"+functionName+".zip";
-
-          return new Deploy(functionName);
+          return functionName;
         });
 
-        return BbPromise.all(bundleQueue);
+        return series(bundleQueue);
 
       })
 
 
     this.hooks = {
-      //Handle `sls deploy`
+
       'before:package:createDeploymentArtifacts': this.zipService
 
     }
   }
 }
 
+function series(functionNames) {
+  var _this = this;
 
+  var sequence = Promise.resolve();
 
-module.exports = SlsBrowserify;
-
-/*
-//Handle `sls deploy`
-'before:deploy:createDeploymentArtifacts': () => BbPromise.bind(this)
-  .then(this.validate)
-  .then(this.globalConfig)
-  .then(() => {
-    const functionNames = this.serverless.service.getAllFunctions();
-    const bundleQueue   = functionNames.map(functionName => {
-      return this.bundle(functionName);
+  functionNames.forEach(function(functionName) {
+    // Chain one computation onto the sequence
+    sequence = sequence.then(function() {
+      return new Deploy(functionName);
+    }).then(function(result) {
+      return true;
     });
 
-    return BbPromise.all(bundleQueue);
   })
-  .catch(handleSkip),
 
-//Handle `sls deploy function`
-'before:deploy:function:packageFunction': () => BbPromise.bind(this)
-  .then(this.validate)
-  .then(this.globalConfig)
-  .then(() => this.bundle(this.options.function))
-  .catch(handleSkip),
+  // This will resolve after the entire chain is resolved
+  return sequence;
+}
 
-
-*/
+module.exports = SmartPacker;
