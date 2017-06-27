@@ -1,0 +1,17 @@
+{
+  "name": "ses",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bluebird": "^3.5.0",
+    "knex": "^0.13.0",
+    "pg": "^6.4.0",
+    "plates": "^0.4.11"
+  }
+}

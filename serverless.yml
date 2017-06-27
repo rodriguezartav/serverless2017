@@ -1,0 +1,29 @@
+service: email
+
+package:
+  individually: true
+  exclude:
+    - "*/**"
+    - node_modules
+    - node_modules/**
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+
+plugins:
+  - plugin
+
+functions:
+  sqsBulkEmailConsumer:
+    handler: sqsBulkEmailConsumer/index.handler
+    environment:
+      TASK_QUEUE_URL: https://sqs.us-east-1.amazonaws.com/246741407701/emailbulk.fifo
+      AWS_LAMBDA_ROLE: arn:aws:iam::246741407701:role/aws-nodejs-dev-us-east-1-lambdaRole
+    package:
+      ignore: true
+
+  sendEmailWorker:
+    handler: sendEmailWorker/index.handler
+    package:
+      ignore: true
