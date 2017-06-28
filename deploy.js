@@ -2,7 +2,7 @@ var exec = require('child_process').exec;
 var fs = require('fs');
 var os = require('os');
 var rimraf = require("rimraf");
-
+var mkdirp = require("mkdirp");
 
 function DeployFunction(functionName){
   var _this = this;
@@ -15,7 +15,6 @@ function DeployFunction(functionName){
     return _this.rsync("functions/node_modules", './functions/' + functionName);
   })
 }
-
 
 
 DeployFunction.prototype.rsync = function (source, destination) {
@@ -37,6 +36,7 @@ DeployFunction.prototype.zip = function(functionName,useNodeModules){
   function promise(resolve,reject){
     var zipfile = functionName+'.zip';
     rimraf.sync("./.serverless/" + functionName +".zip");
+    mkdirp.sync("./.serverless");
     var cmd = 'zip -r ../.serverless/' + zipfile + ' ' + functionName + '/* ./common/*';
     if(useNodeModules) cmd += ' ./node_modules/*';
     exec(cmd, {

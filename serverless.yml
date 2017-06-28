@@ -20,6 +20,8 @@ functions:
     environment:
       TASK_QUEUE_URL: https://sqs.us-east-1.amazonaws.com/246741407701/emailbulk.fifo
       AWS_LAMBDA_ROLE: arn:aws:iam::246741407701:role/aws-nodejs-dev-us-east-1-lambdaRole
+    events:
+      - schedule: rate(1 minute)
     package:
       ignore: true
 

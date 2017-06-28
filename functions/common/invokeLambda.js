@@ -1,11 +1,11 @@
 var AWS = require("aws-sdk");
 var lambda = new AWS.Lambda({region: process.env.AWS_REGION});
 
-function invokeWorkerLambda(event, callback) {
+function invokeWorkerLambda(lambdaName,event, callback) {
   if(process.env.IS_TEST) callback(null,{});
 
   var params = {
-    FunctionName: process.env.WORKER_LAMBDA_NAME,
+    FunctionName: lambdaName,
     InvocationType: 'Event',
     Payload: JSON.stringify(event)
   };

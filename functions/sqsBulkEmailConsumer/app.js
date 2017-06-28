@@ -1,4 +1,4 @@
-var LAMBDA_FUNCTION_NAME='email-SendEmailWorker';
+var LAMBDA_FUNCTION_NAME='email-dev-sendEmailWorker';
 var Promise = require("bluebird");
 var async = require("async");
 

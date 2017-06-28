@@ -16,7 +16,6 @@ class SmartPacker {
 
     this.zipService = () => BbPromise.bind(this)
       .then(function(){
-
         const functionNames = this.serverless.service.getAllFunctions();
         const bundleQueue   = functionNames.map(functionName => {
           _this.serverless.cli.log(`Bundling ${functionName} with SmartPacker...`);
@@ -31,8 +30,9 @@ class SmartPacker {
 
 
     this.hooks = {
+      'before:package:createDeploymentArtifacts': this.zipService,
+      'before:deploy:function:packageFunction':this.zipService
 
-      'before:package:createDeploymentArtifacts': this.zipService
 
     }
   }
